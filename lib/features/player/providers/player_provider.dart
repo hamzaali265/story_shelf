@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'dart:io';
+import 'package:audio_service/audio_service.dart';
 import '../../../core/database/hive_database.dart';
 import '../../../core/models/book_model.dart';
 import '../../../core/models/chapter_model.dart';
@@ -12,8 +13,33 @@ import '../../../core/services/audiobook_audio_handler.dart';
 import '../../library/providers/library_provider.dart';
 import '../../settings/providers/settings_provider.dart';
 
+late final AudiobookAudioHandler globalAudioHandler;
+
+Future<AudiobookAudioHandler> initAudioService() async {
+  if (Platform.environment.containsKey('FLUTTER_TEST')) {
+    globalAudioHandler = AudiobookAudioHandler();
+    return globalAudioHandler;
+  }
+
+  try {
+    globalAudioHandler = await AudioService.init(
+      builder: () => AudiobookAudioHandler(),
+      config: const AudioServiceConfig(
+        androidNotificationChannelId: 'com.storyshelf.app.channel.audio',
+        androidNotificationChannelName: 'StoryShelf Playback',
+        androidNotificationOngoing: true,
+        androidStopForegroundOnPause: true,
+        androidNotificationIcon: 'mipmap/ic_launcher',
+      ),
+    );
+  } catch (_) {
+    globalAudioHandler = AudiobookAudioHandler();
+  }
+  return globalAudioHandler;
+}
+
 final audioHandlerProvider = Provider<AudiobookAudioHandler>((ref) {
-  return AudiobookAudioHandler();
+  return globalAudioHandler;
 });
 
 final dynamicAccentProvider = StateProvider<Color?>((ref) => null);

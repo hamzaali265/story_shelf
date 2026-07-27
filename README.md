@@ -46,6 +46,7 @@
 
 ### 📱 Background Playback & Storage
 - Native Android lock screen controls and notification interface powered by `audio_service` and `just_audio`.
+- Compact notification controls (-10s Rewind, Play/Pause, +30s Fast-Forward) with live chapter title updates on lock screen.
 - Position tracking, custom playback speeds (0.5x – 3.0x), end-of-chapter sleep timers, and bookmarks stored locally in Hive.
 
 ---
