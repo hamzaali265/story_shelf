@@ -23,6 +23,8 @@ class AudiobookAudioHandler extends BaseAudioHandler with SeekHandler {
   List<Chapter> get chapters => _chapters;
   DateTime? get sleepTimerEndTime => _sleepTimerEndTime;
 
+  String? _lastChapterTitle;
+
   void _initPlayerListeners() {
     // Relay playback events from just_audio into audio_service playbackState
     _player.playbackEventStream.listen(_broadcastState);
@@ -34,12 +36,19 @@ class AudiobookAudioHandler extends BaseAudioHandler with SeekHandler {
       }
     });
 
-    // Monitor position for chapter changes and sleep timer (end of chapter)
+    // Monitor position for dynamic chapter title notification and end-of-chapter sleep timer
     _player.positionStream.listen((pos) {
-      if (_stopAtChapterEnd && _currentBook != null && _chapters.isNotEmpty) {
-        final currentChapter = getCurrentChapter(pos.inSeconds.toDouble());
-        if (currentChapter != null) {
-          final timeRemainingInChapter = currentChapter.endSeconds - pos.inSeconds.toDouble();
+      final posSec = pos.inSeconds.toDouble();
+
+      if (_currentBook != null && _chapters.isNotEmpty) {
+        final currentChapter = getCurrentChapter(posSec);
+        if (currentChapter != null && currentChapter.title != _lastChapterTitle) {
+          _lastChapterTitle = currentChapter.title;
+          _updateMediaItemWithChapter(currentChapter);
+        }
+
+        if (_stopAtChapterEnd && currentChapter != null) {
+          final timeRemainingInChapter = currentChapter.endSeconds - posSec;
           if (timeRemainingInChapter <= 1.0) {
             pause();
             _stopAtChapterEnd = false;
@@ -48,6 +57,19 @@ class AudiobookAudioHandler extends BaseAudioHandler with SeekHandler {
         }
       }
     });
+  }
+
+  void _updateMediaItemWithChapter(Chapter chapter) {
+    if (_currentBook == null) return;
+    final artUri = _currentBook!.coverPath != null ? Uri.file(_currentBook!.coverPath!) : null;
+    mediaItem.add(MediaItem(
+      id: _currentBook!.id,
+      album: _currentBook!.album ?? 'StoryShelf',
+      title: '${chapter.title} • ${_currentBook!.title}',
+      artist: _currentBook!.author,
+      duration: Duration(seconds: _currentBook!.durationSeconds.round()),
+      artUri: artUri,
+    ));
   }
 
   void _broadcastState(PlaybackEvent event) {
@@ -65,7 +87,7 @@ class AudiobookAudioHandler extends BaseAudioHandler with SeekHandler {
         MediaAction.seekForward,
         MediaAction.seekBackward,
       },
-      androidCompactActionIndices: const [1, 2, 3],
+      androidCompactActionIndices: const [0, 2, 4],
       processingState: const {
         ProcessingState.idle: AudioProcessingState.idle,
         ProcessingState.loading: AudioProcessingState.loading,
@@ -178,7 +200,7 @@ class AudiobookAudioHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> rewind() async {
-    final newPos = _player.position - const Duration(seconds: 15);
+    final newPos = _player.position - const Duration(seconds: 10);
     await seek(newPos < Duration.zero ? Duration.zero : newPos);
   }
 
