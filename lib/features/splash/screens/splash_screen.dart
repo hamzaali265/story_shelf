@@ -39,9 +39,9 @@ class _SplashScreenState extends State<SplashScreen>
     // Navigate to LibraryScreen after splash sequence
     Future.delayed(const Duration(milliseconds: 2000), () {
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-          SmoothPageRoute(page: const LibraryScreen()),
-        );
+        Navigator.of(
+          context,
+        ).pushReplacement(SmoothPageRoute(page: const LibraryScreen()));
       }
     });
   }
@@ -90,7 +90,9 @@ class _SplashScreenState extends State<SplashScreen>
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: AppTheme.primaryAccent.withValues(alpha: 0.4),
+                            color: AppTheme.primaryAccent.withValues(
+                              alpha: 0.4,
+                            ),
                             blurRadius: 36,
                             spreadRadius: 6,
                           ),
@@ -163,7 +165,9 @@ class _SplashScreenState extends State<SplashScreen>
                 height: 24,
                 child: CircularProgressIndicator(
                   strokeWidth: 2.5,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppTheme.secondaryAccent),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppTheme.secondaryAccent,
+                  ),
                 ),
               ),
             ),
