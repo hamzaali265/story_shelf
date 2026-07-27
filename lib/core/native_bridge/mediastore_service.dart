@@ -6,7 +6,9 @@ import '../models/book_model.dart';
 import '../utils/m4b_parser.dart';
 
 class MediaStoreService {
-  static const MethodChannel _channel = MethodChannel('com.storyshelf.app/mediastore');
+  static const MethodChannel _channel = MethodChannel(
+    'com.storyshelf.app/mediastore',
+  );
 
   /// Request appropriate storage/audio permissions for Android
   static Future<bool> requestStoragePermissions() async {
@@ -17,6 +19,7 @@ class MediaStoreService {
         Permission.audio,
         Permission.storage,
         Permission.manageExternalStorage,
+        Permission.notification,
       ].request();
       debugPrint('StoryShelfScan: Permission statuses = $statuses');
     } catch (e) {
@@ -33,8 +36,12 @@ class MediaStoreService {
 
     if (Platform.isAndroid) {
       try {
-        final List<dynamic>? rawList = await _channel.invokeMethod('scanAudiobooks');
-        debugPrint('StoryShelfScan: MethodChannel returned ${rawList?.length ?? 0} raw items');
+        final List<dynamic>? rawList = await _channel.invokeMethod(
+          'scanAudiobooks',
+        );
+        debugPrint(
+          'StoryShelfScan: MethodChannel returned ${rawList?.length ?? 0} raw items',
+        );
 
         if (rawList != null) {
           for (final item in rawList) {
@@ -42,7 +49,8 @@ class MediaStoreService {
             final path = map['path'] as String? ?? '';
             if (path.isEmpty) continue;
 
-            final rawDurationMillis = (map['duration'] as num?)?.toDouble() ?? 0.0;
+            final rawDurationMillis =
+                (map['duration'] as num?)?.toDouble() ?? 0.0;
             final durationSeconds = rawDurationMillis / 1000.0;
 
             final filename = path.contains('/')
@@ -53,36 +61,49 @@ class MediaStoreService {
                 : filename;
 
             final rawTitle = map['title'] as String?;
-            final title = (rawTitle != null && rawTitle.isNotEmpty) ? rawTitle : nameWithoutExt;
+            final title = (rawTitle != null && rawTitle.isNotEmpty)
+                ? rawTitle
+                : nameWithoutExt;
             final rawArtist = map['artist'] as String?;
-            final author = (rawArtist != null && rawArtist.isNotEmpty && rawArtist != '<unknown>')
+            final author =
+                (rawArtist != null &&
+                    rawArtist.isNotEmpty &&
+                    rawArtist != '<unknown>')
                 ? rawArtist
                 : 'Unknown Author';
 
             final sizeBytes = (map['size'] as num?)?.toInt() ?? 0;
-            final lastMod = (map['dateModified'] as num?)?.toInt() ?? (DateTime.now().millisecondsSinceEpoch ~/ 1000);
+            final lastMod =
+                (map['dateModified'] as num?)?.toInt() ??
+                (DateTime.now().millisecondsSinceEpoch ~/ 1000);
 
-            books.add(Book(
-              id: map['id']?.toString() ?? path.hashCode.toString(),
-              filePath: path,
-              title: title.isNotEmpty ? title : nameWithoutExt,
-              author: author,
-              album: map['album'] as String?,
-              durationSeconds: durationSeconds,
-              fileSizeBytes: sizeBytes,
-              lastModified: lastMod,
-              coverPath: null,
-              chapters: [],
-              addedDate: DateTime.now(),
-            ));
+            books.add(
+              Book(
+                id: map['id']?.toString() ?? path.hashCode.toString(),
+                filePath: path,
+                title: title.isNotEmpty ? title : nameWithoutExt,
+                author: author,
+                album: map['album'] as String?,
+                durationSeconds: durationSeconds,
+                fileSizeBytes: sizeBytes,
+                lastModified: lastMod,
+                coverPath: null,
+                chapters: [],
+                addedDate: DateTime.now(),
+              ),
+            );
           }
         }
       } catch (e, stack) {
-        debugPrint('StoryShelfScan: Error during scanDeviceAudiobooks: $e\n$stack');
+        debugPrint(
+          'StoryShelfScan: Error during scanDeviceAudiobooks: $e\n$stack',
+        );
       }
     }
 
-    debugPrint('StoryShelfScan: Returning ${books.length} initial Book objects');
+    debugPrint(
+      'StoryShelfScan: Returning ${books.length} initial Book objects',
+    );
     return books;
   }
 
@@ -90,7 +111,10 @@ class MediaStoreService {
   static Future<Book> enrichBookMetadata(Book book) async {
     try {
       var durationSec = book.durationSeconds;
-      final m4bMeta = await M4bParser.parseFileInIsolate(book.filePath, durationSec);
+      final m4bMeta = await M4bParser.parseFileInIsolate(
+        book.filePath,
+        durationSec,
+      );
 
       if (durationSec <= 0 && m4bMeta.chapters.isNotEmpty) {
         durationSec = m4bMeta.chapters.last.endSeconds;
@@ -98,11 +122,17 @@ class MediaStoreService {
 
       String? coverPath;
       try {
-        coverPath = await _channel.invokeMethod<String>('extractCoverArt', {'path': book.filePath});
+        coverPath = await _channel.invokeMethod<String>('extractCoverArt', {
+          'path': book.filePath,
+        });
       } catch (_) {}
 
-      final title = (m4bMeta.title != null && m4bMeta.title!.isNotEmpty) ? m4bMeta.title! : book.title;
-      final author = (m4bMeta.author != null && m4bMeta.author!.isNotEmpty) ? m4bMeta.author! : book.author;
+      final title = (m4bMeta.title != null && m4bMeta.title!.isNotEmpty)
+          ? m4bMeta.title!
+          : book.title;
+      final author = (m4bMeta.author != null && m4bMeta.author!.isNotEmpty)
+          ? m4bMeta.author!
+          : book.author;
 
       return book.copyWith(
         title: title,
