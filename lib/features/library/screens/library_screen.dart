@@ -8,7 +8,9 @@ import '../widgets/book_card.dart';
 import '../widgets/continue_listening_card.dart';
 import '../widgets/empty_library_view.dart';
 import '../widgets/shimmer_loading.dart';
+import '../../../core/models/book_model.dart';
 import '../../player/providers/player_provider.dart';
+import '../../player/screens/player_screen.dart';
 import '../../player/widgets/mini_player.dart';
 import '../../search/screens/search_screen.dart';
 import '../../settings/screens/settings_screen.dart';
@@ -22,6 +24,18 @@ class LibraryScreen extends ConsumerStatefulWidget {
 
 class _LibraryScreenState extends ConsumerState<LibraryScreen> {
   bool _isGridView = true;
+
+  void _openPlayer(
+    BuildContext context,
+    WidgetRef ref,
+    Book book,
+    String heroTag,
+  ) {
+    ref.read(playerProvider.notifier).playBook(book);
+    Navigator.of(
+      context,
+    ).push(SmoothPageRoute(page: PlayerScreen(heroTag: heroTag)));
+  }
 
   @override
   void initState() {
@@ -183,15 +197,12 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
                           isLoading: isBookLoading,
                           isPlaying: isBookPlaying,
                           onResumeTap: () {
-                            if (isBookPlaying) {
-                              ref
-                                  .read(playerProvider.notifier)
-                                  .togglePlayPause();
-                            } else {
-                              ref
-                                  .read(playerProvider.notifier)
-                                  .playBook(activeContinueBook);
-                            }
+                            _openPlayer(
+                              context,
+                              ref,
+                              activeContinueBook,
+                              'cover_continue_${activeContinueBook.id}',
+                            );
                           },
                         ),
                       );
@@ -348,7 +359,12 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
                           playbackState: pbState,
                           isGridView: true,
                           onTap: () {
-                            ref.read(playerProvider.notifier).playBook(book);
+                            _openPlayer(
+                              context,
+                              ref,
+                              book,
+                              'hero_grid_${book.id}',
+                            );
                           },
                         );
                       }, childCount: displayedBooks.length),
@@ -366,7 +382,12 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
                           playbackState: pbState,
                           isGridView: false,
                           onTap: () {
-                            ref.read(playerProvider.notifier).playBook(book);
+                            _openPlayer(
+                              context,
+                              ref,
+                              book,
+                              'hero_list_${book.id}',
+                            );
                           },
                         );
                       }, childCount: displayedBooks.length),
