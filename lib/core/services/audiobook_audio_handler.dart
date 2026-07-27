@@ -11,7 +11,7 @@ class AudiobookAudioHandler extends BaseAudioHandler with SeekHandler {
   Timer? _sleepTimer;
   DateTime? _sleepTimerEndTime;
   bool _stopAtChapterEnd = false;
-  
+
   Stream<Duration> get positionStream => _player.positionStream;
 
   AudiobookAudioHandler() {
@@ -42,7 +42,8 @@ class AudiobookAudioHandler extends BaseAudioHandler with SeekHandler {
 
       if (_currentBook != null && _chapters.isNotEmpty) {
         final currentChapter = getCurrentChapter(posSec);
-        if (currentChapter != null && currentChapter.title != _lastChapterTitle) {
+        if (currentChapter != null &&
+            currentChapter.title != _lastChapterTitle) {
           _lastChapterTitle = currentChapter.title;
           _updateMediaItemWithChapter(currentChapter);
         }
@@ -61,63 +62,75 @@ class AudiobookAudioHandler extends BaseAudioHandler with SeekHandler {
 
   void _updateMediaItemWithChapter(Chapter chapter) {
     if (_currentBook == null) return;
-    final artUri = _currentBook!.coverPath != null ? Uri.file(_currentBook!.coverPath!) : null;
-    mediaItem.add(MediaItem(
-      id: _currentBook!.id,
-      album: _currentBook!.album ?? 'StoryShelf',
-      title: '${chapter.title} • ${_currentBook!.title}',
-      artist: _currentBook!.author,
-      duration: Duration(seconds: _currentBook!.durationSeconds.round()),
-      artUri: artUri,
-    ));
+    final artUri = _currentBook!.coverPath != null
+        ? Uri.file(_currentBook!.coverPath!)
+        : null;
+    mediaItem.add(
+      MediaItem(
+        id: _currentBook!.id,
+        album: _currentBook!.album ?? 'StoryShelf',
+        title: '${chapter.title} • ${_currentBook!.title}',
+        artist: _currentBook!.author,
+        duration: Duration(seconds: _currentBook!.durationSeconds.round()),
+        artUri: artUri,
+      ),
+    );
   }
 
   void _broadcastState(PlaybackEvent event) {
     final playing = _player.playing;
-    playbackState.add(playbackState.value.copyWith(
-      controls: [
-        MediaControl.rewind,
-        MediaControl.skipToPrevious,
-        if (playing) MediaControl.pause else MediaControl.play,
-        MediaControl.skipToNext,
-        MediaControl.fastForward,
-      ],
-      systemActions: const {
-        MediaAction.seek,
-        MediaAction.seekForward,
-        MediaAction.seekBackward,
-      },
-      androidCompactActionIndices: const [0, 2, 4],
-      processingState: const {
-        ProcessingState.idle: AudioProcessingState.idle,
-        ProcessingState.loading: AudioProcessingState.loading,
-        ProcessingState.buffering: AudioProcessingState.buffering,
-        ProcessingState.ready: AudioProcessingState.ready,
-        ProcessingState.completed: AudioProcessingState.completed,
-      }[_player.processingState]!,
-      playing: playing,
-      updatePosition: _player.position,
-      bufferedPosition: _player.bufferedPosition,
-      speed: _player.speed,
-      queueIndex: event.currentIndex,
-    ));
+    playbackState.add(
+      playbackState.value.copyWith(
+        controls: [
+          MediaControl.rewind,
+          MediaControl.skipToPrevious,
+          if (playing) MediaControl.pause else MediaControl.play,
+          MediaControl.skipToNext,
+          MediaControl.fastForward,
+        ],
+        systemActions: const {
+          MediaAction.seek,
+          MediaAction.seekForward,
+          MediaAction.seekBackward,
+        },
+        androidCompactActionIndices: const [0, 2, 4],
+        processingState: const {
+          ProcessingState.idle: AudioProcessingState.idle,
+          ProcessingState.loading: AudioProcessingState.loading,
+          ProcessingState.buffering: AudioProcessingState.buffering,
+          ProcessingState.ready: AudioProcessingState.ready,
+          ProcessingState.completed: AudioProcessingState.completed,
+        }[_player.processingState]!,
+        playing: playing,
+        updatePosition: _player.position,
+        bufferedPosition: _player.bufferedPosition,
+        speed: _player.speed,
+        queueIndex: event.currentIndex,
+      ),
+    );
   }
 
   /// Load an audiobook for playback
-  Future<void> loadBook(Book book, {double startPositionSeconds = 0.0, double speed = 1.0}) async {
+  Future<void> loadBook(
+    Book book, {
+    double startPositionSeconds = 0.0,
+    double speed = 1.0,
+  }) async {
     _currentBook = book;
     _chapters = book.chapters;
 
     final artUri = book.coverPath != null ? Uri.file(book.coverPath!) : null;
 
-    mediaItem.add(MediaItem(
-      id: book.id,
-      album: book.album ?? 'StoryShelf',
-      title: book.title,
-      artist: book.author,
-      duration: Duration(seconds: book.durationSeconds.round()),
-      artUri: artUri,
-    ));
+    mediaItem.add(
+      MediaItem(
+        id: book.id,
+        album: book.album ?? 'StoryShelf',
+        title: book.title,
+        artist: book.author,
+        duration: Duration(seconds: book.durationSeconds.round()),
+        artUri: artUri,
+      ),
+    );
 
     await _player.setFilePath(book.filePath);
     await _player.setSpeed(speed);
@@ -129,7 +142,8 @@ class AudiobookAudioHandler extends BaseAudioHandler with SeekHandler {
   Chapter? getCurrentChapter(double positionSeconds) {
     if (_chapters.isEmpty) return null;
     for (final ch in _chapters) {
-      if (positionSeconds >= ch.startSeconds && positionSeconds <= ch.endSeconds) {
+      if (positionSeconds >= ch.startSeconds &&
+          positionSeconds <= ch.endSeconds) {
         return ch;
       }
     }

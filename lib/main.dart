@@ -11,11 +11,7 @@ void main() async {
   await HiveDatabase.init();
   await initAudioService();
 
-  runApp(
-    const ProviderScope(
-      child: StoryShelfApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: StoryShelfApp()));
 }
 
 class StoryShelfApp extends ConsumerWidget {
