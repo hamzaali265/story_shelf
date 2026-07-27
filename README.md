@@ -120,6 +120,15 @@ story_shelf/
 
 ---
 
+## Releases & Downloads
+
+Pre-compiled Android APK binaries and release tags are available under [Releases](https://github.com/hamzaali265/story_shelf/releases/tag/v1.0.0).
+
+- **Latest Version**: [`v1.0.0`](https://github.com/hamzaali265/story_shelf/releases/tag/v1.0.0)
+- **Target**: Android 7.0+ (API 24+)
+
+---
+
 ## License
 
 Distributed under the [MIT License](LICENSE).
