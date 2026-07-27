@@ -100,16 +100,18 @@ lib/
 ## 📱 Screenshots & UI Highlights
 
 <div align="center">
-  <img src="assets/screenshots/home_screen.png" width="340" alt="Home Library Screen" />
-  &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="assets/screenshots/player_screen.png" width="340" alt="Player Screen" />
+  <img src="assets/screenshots/home_screen.png" width="250" alt="Home Library Screen" />
+  &nbsp;&nbsp;&nbsp;
+  <img src="assets/screenshots/player_screen.png" width="250" alt="Full Player Screen" />
+  &nbsp;&nbsp;&nbsp;
+  <img src="assets/screenshots/chapters_screen.png" width="250" alt="Embedded M4B Chapter Picker" />
 </div>
 
 <br/>
 
-| Home Library Dashboard | Dynamic Full-Screen Player |
-|:---:|:---:|
-| Time-based greeting banner, Continue Listening hero card with circular progress ring, pill filters, grid/list view | Dynamic gradient backdrop, scrubber bar, speed selector, end-of-chapter sleep timer & chapter picker |
+| Home Library Dashboard | Dynamic Full-Screen Player | Embedded M4B Chapter Picker |
+|:---:|:---:|:---:|
+| Time-based greeting banner, Continue Listening hero card with circular progress ring, pill filters, grid/list view | Dynamic gradient backdrop, scrubber bar, speed selector & sleep timer | Embedded M4B chapter list with duration indicators and active chapter highlight |
 
 ---
 
