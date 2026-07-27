@@ -99,9 +99,17 @@ lib/
 
 ## 📱 Screenshots & UI Highlights
 
-| Home Library & Greeting | Continue Listening Hero | Dynamic Full-Screen Player | Chapter Selector |
-|:---:|:---:|:---:|:---:|
-| Time-based greeting banner, pill filters, grid/list view | Circular progress ring around artwork, instant play | Dynamic gradient backdrop, scrubber bar, speed control | Embedded M4B chapter list with duration indicators |
+<div align="center">
+  <img src="assets/screenshots/home_screen.png" width="340" alt="Home Library Screen" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/screenshots/player_screen.png" width="340" alt="Player Screen" />
+</div>
+
+<br/>
+
+| Home Library Dashboard | Dynamic Full-Screen Player |
+|:---:|:---:|
+| Time-based greeting banner, Continue Listening hero card with circular progress ring, pill filters, grid/list view | Dynamic gradient backdrop, scrubber bar, speed selector, end-of-chapter sleep timer & chapter picker |
 
 ---
 
