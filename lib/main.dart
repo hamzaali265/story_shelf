@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/database/hive_database.dart';
 import 'core/theme/app_theme.dart';
-import 'features/library/screens/library_screen.dart';
 import 'features/player/providers/player_provider.dart';
+import 'features/splash/screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,7 +29,7 @@ class StoryShelfApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.dark,
       darkTheme: AppTheme.darkTheme(dynamicAccent),
-      home: const LibraryScreen(),
+      home: const SplashScreen(),
     );
   }
 }
